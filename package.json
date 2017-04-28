@@ -1,0 +1,22 @@
+{
+  "name": "master-migration-wallet",
+  "version": "1.0.0",
+  "description": "UI for a multisig contract holding the migration funds for SJCX -> STORJ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nginnever/master-migration-wallet.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nginnever/master-migration-wallet/issues"
+  },
+  "homepage": "https://github.com/nginnever/master-migration-wallet#readme",
+  "dependencies": {
+    "web3": "^0.18.4"
+  }
+}
