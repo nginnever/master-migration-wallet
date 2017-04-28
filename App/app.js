@@ -2,30 +2,50 @@
 
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"))
-const crypto = require('crypto')
 
-const walletAbi = require('../abi.js').wallet
-const tokenAbi = require('../abi.js').token
-const walletAddress = '0x38242c82478117e94147d140507866dd063d063c'
-const tokenAddress = '0x38242c82478117e94147d140507866dd063d063c'
+const walletAbi = require('./abi.js').wallet
+const tokenAbi = require('./abi.js').token
+const walletAddress = '0x23e44f57f1ba0a0dc1cbda70978caace94c84f0a'
+const tokenAddress = '0xf834a98ef136c912a38b48559cc8bbba7869d0c3'
 
 function App(shard) {
-  this.tokenBalance;
+  this.wallet = getContract(walletAddress, walletAbi)
+  this.token = getContract(tokenAddress, tokenAbi)
+  this.tokenBalance = 0
 }
 
 App.prototype.getTokenBalance = function(cb) {
-  var walletInst = getWallet(walletAddress)
-  var tokenInst = getToken(tokenAddress)
-
+  var self = this
   try{
-    self.tokenBalance = tokenInst.balances('')
-    inst.merkleAudit(this.shard.chunks[ind], '0x'+this.shard.root, proof, {from: web3.eth.accounts[0], gas:3000000}, (err, res) => {
-      console.log(err)
-    })
-  }catch(e){}
-  
+    self.tokenBalance = self.token.balanceOf(walletAddress)
+    return cb(self.tokenBalance)
+  }catch(e){
+    return cb(e)
+  }
+}
 
-  var events = inst.allEvents()
+App.prototype.getOwners = function(callback){
+  var self = this
+  var o = []
+  try{
+    o.push(self.wallet.owners(0))
+    o.push(self.wallet.owners(1))
+    return callback(o)
+  }catch(e){
+    return callback(e)
+  }
+}
+
+App.prototype.confirm = function(tx, callback){
+  var self = this
+  let c
+  try{
+    c = self.wallet.confirmTransaction(tx, {from:web3.eth.accounts[0], gas:1000000})
+    return callback(c)
+  }catch(e){
+    return callback(e)
+  }
+ var events = self.wallet.allEvents()
   events.watch(function(error, event){
     if (error) {
       console.log("Error: " + error);
@@ -34,16 +54,32 @@ App.prototype.getTokenBalance = function(cb) {
       console.log(event.event + ": " + JSON.stringify(event.args));
     }
   })
-  return cb(balance)
 }
 
-App.prototype.getWalletBalance = function(callback){
-   let b
-    try{
-      b = web3.eth.getBalance(web3.eth.accounts[0])
-    }catch(e){}
-    return callback(b)
+App.prototype.sendTokens = function(to, amt, callback){
+  var self = this
+  let s
+  try{
+    var data = self.token.transfer.getData(to, amt)
+    console.log(data)
+    //s = self.wallet.submitTransaction(to, amt, {from:web3.eth.accounts[0], gas:1000000})
+    return callback(s)
+  }catch(e){
+    return callback(e)
+  }
+ var events = self.token.allEvents()
+  events.watch(function(error, event){
+    if (error) {
+      console.log("Error: " + error);
+    } else {
+
+      console.log(event.event + ": " + JSON.stringify(event.args));
+    }
+  })
 }
+
+
+
 
 function verify(data) {
   var temp;
@@ -57,45 +93,6 @@ function verify(data) {
   return temp
 }
 
-function generateTree(shard, leaves) {
-  var temp = []
-  var d = 0
-
-  if(leaves.length === 1) {
-    shard.nodes.push({ data: { id: leaves[0], trim: leaves[0], align:'top', color: '#11479e' } })
-    shard.root = leaves[0]
-    return 
-  }
-
-  for(var i = 0; i < leaves.length; i+=2) {
-    // if(shard.preImage === false){
-    //   shard.nodes.push({ data: { id: i, trim: i, align:'bottom', color: '#e6e600'} })
-    //   shard.nodes.push({ data: { id: i+1, trim: i+1, align:'bottom', color: '#e6e600'} })
-    //   shard.edges.push({ data: { source: leaves[i], target: i } })
-    //   shard.edges.push({ data: { source: leaves[i+1], target: i+1 } })
-    // }
-
-    //shard.nodes.push({ data: { id: leaves[i], trim: leaves[i].substring(0,4)+'...', align:'top', color: '#11479e'} })
-    //shard.nodes.push({ data: { id: leaves[i+1], trim: leaves[i+1].substring(0,4)+'...', align:'top', color: '#11479e'} })
-    
-    var tempHash = sha3Hex(leaves[i]+leaves[i+1])
-    // var tempHash = new SHA3.SHA3Hash(256)
-
-    // tempHash.update(leaves[i])
-    // tempHash.update(leaves[i+1])
-    // tempHash = tempHash.digest('hex')
-
-    //shard.edges.push({ data: { source: tempHash, target: leaves[i] } })
-    //shard.edges.push({ data: { source: tempHash, target: leaves[i+1] } })
-
-    temp.push(tempHash)
-  }
-
-  //shard.preImage = true
-  shard.levels.push(temp)
-  return generateTree(shard, temp)
-}
-
 function _nextPowerOfTwo(input) {
   var x = 0
   while(input > Math.pow(2, x)) {
@@ -104,8 +101,8 @@ function _nextPowerOfTwo(input) {
   return x
 }
 
-function getContract (addy) {
-  var contract = web3.eth.contract(abiContract)
+function getContract (addy, _abi) {
+  var contract = web3.eth.contract(_abi)
   var inst = contract.at(addy)
   return inst
 }
