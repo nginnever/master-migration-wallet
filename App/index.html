@@ -50,8 +50,9 @@
         })
 
         $('#getConfirms').click(function() {
-          a.getConfirms($('#txHash').val(), (res)=>{
-            (".confirms").html("<p>Confirms</p>"+ res)
+          a.getConfirms($('#txHash2').val(), (res)=>{
+            console.log(res)
+            $(".confirms").html("<p>Confirms: "+ res + "</p>")
           })
         })
       })
@@ -103,7 +104,7 @@
       <p style="color:blue;">Get Confirmations</p>
       <div class="confirms"></div>
       <p>TX hash:</p>
-      <input type="text" id="txHash" name="valueId" size="36"/>
+      <input type="text" id="txHash2" name="valueId" size="36"/>
       <br/>
       <br/>
       <button type="submit" id="getConfirms" name="submitButton">Get</button>

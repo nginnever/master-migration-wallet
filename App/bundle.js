@@ -21077,19 +21077,31 @@ App.prototype.confirm = function(tx, callback){
   let c
   try{
     c = self.wallet.confirmTransaction(tx, {from:web3.eth.accounts[0], gas:1000000})
-    return callback(c)
   }catch(e){
     return callback(e)
   }
- var events = self.wallet.allEvents()
+  var events = self.wallet.allEvents()
   events.watch(function(error, event){
     if (error) {
       console.log("Error: " + error);
     } else {
-
+      console.log('++++++++')
       console.log(event.event + ": " + JSON.stringify(event.args));
+      console.log('++++++++')
+      return callback(c)
     }
   })
+}
+
+App.prototype.getConfirms = function(tx, callback){
+  var self = this
+  var c = 0
+  try{
+    c = self.wallet.confirmationCount(tx)
+    return callback(c.c[0])
+  }catch(e){
+    return callback(e)
+  }
 }
 
 App.prototype.sendTokens = function(to, amt, callback){
@@ -21098,18 +21110,22 @@ App.prototype.sendTokens = function(to, amt, callback){
   try{
     var data = self.token.transfer.getData(to, amt)
     console.log(data)
-    //s = self.wallet.submitTransaction(to, amt, {from:web3.eth.accounts[0], gas:1000000})
-    return callback(s)
+    var nonce = Math.floor((Math.random() * 100000) + 1);
+    console.log(nonce)
+    s = self.wallet.submitTransaction(to, amt, data, '0x'+nonce, {from:web3.eth.accounts[0], gas:1000000})
+    console.log(s)
   }catch(e){
     return callback(e)
   }
- var events = self.token.allEvents()
+  var events = self.wallet.allEvents()
   events.watch(function(error, event){
     if (error) {
       console.log("Error: " + error);
     } else {
-
+      console.log('++++++++')
       console.log(event.event + ": " + JSON.stringify(event.args));
+      console.log('++++++++')
+      return callback(s)
     }
   })
 }
