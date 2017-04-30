@@ -21073,6 +21073,7 @@ App.prototype.getOwners = function(callback){
 }
 
 App.prototype.confirm = function(tx, callback){
+  console.log(tx)
   var self = this
   let c
   try{
@@ -21105,6 +21106,8 @@ App.prototype.getConfirms = function(tx, callback){
 }
 
 App.prototype.sendTokens = function(to, amt, callback){
+  console.log(to)
+  console.log(amt)
   var self = this
   let s
   try{
@@ -21112,7 +21115,7 @@ App.prototype.sendTokens = function(to, amt, callback){
     console.log(data)
     var nonce = Math.floor((Math.random() * 100000) + 1);
     console.log(nonce)
-    s = self.wallet.submitTransaction(to, amt, data, '0x'+nonce, {from:web3.eth.accounts[0], gas:1000000})
+    s = self.wallet.submitTransaction(tokenAddress, 0, data, '0x'+nonce, {from:web3.eth.accounts[0], gas:1000000})
     console.log(s)
   }catch(e){
     return callback(e)
