@@ -56,19 +56,6 @@
           })
         })
       })
-
-      var audit = function(index) {
-
-      }
-
-      var handleFiles = function(files) {
-        a = new App(window.shard)
-        var rs = window.getFileStream(files);
-        a.generateNodes(rs, (tree) => {
-          //renderGraph(tree)
-          //console.log(tree)
-        })
-      }
     </script>
   </head>
 
@@ -79,10 +66,10 @@
     <hr/>
     <p style="color:blue">Submit Token Transaction: </p>
     <p>To:</p>
-    <input type="text" id="toAddress" name="valueId" size="36"/>
+    <input type="text" id="toAddress" name="valueId" size="38"/>
     <br/>
     <p>Tokens:</p>
-    <input type="text" id="numTokens" name="valueId" size="6"/>
+    <input type="text" id="numTokens" name="valueId" size="20"/>
     <br/>
     <br/>
     <button type="submit" id="theButton" name="submitButton">Send Tokens</button>

@@ -21077,7 +21077,7 @@ App.prototype.confirm = function(tx, callback){
   var self = this
   let c
   try{
-    c = self.wallet.confirmTransaction(tx, {from:web3.eth.accounts[0], gas:1000000})
+    c = self.wallet.confirmTransaction(tx, {from:web3.eth.accounts[1], gas:1000000})
   }catch(e){
     return callback(e)
   }
