@@ -76,8 +76,6 @@ App.prototype.getConfirms = function(tx, callback){
 }
 
 App.prototype.sendTokens = function(to, amt, callback){
-  console.log(to)
-  console.log(amt)
   var self = this
   let s
   try{
