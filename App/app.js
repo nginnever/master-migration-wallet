@@ -75,11 +75,15 @@ App.prototype.sendTokens = function(to, amt, callback){
   var self = this
   let s
   try{
-    var data = self.token.transfer.getData(to, amt)
+    var data = []
+    data.push(self.token.transfer.getData(to, amt))
+    data.push(self.token.transfer.getData(to, amt))
+    console.log(data[0].length)
     console.log(data)
     var nonce = Math.floor((Math.random() * 100000) + 1);
     console.log(nonce)
-    s = self.wallet.submitTransaction(tokenAddress, 0, data, '0x'+nonce, {from:web3.eth.accounts[0], gas:1000000})
+    //s = self.wallet.submitTransaction(tokenAddress, 0, data, '0x'+nonce, {from:web3.eth.accounts[0], gas:1000000})
+    //s = self.wallet.submitBatch(tokenAddress, 0, data, '0x'+nonce, {from:web3.eth.accounts[0], gas:1000000})
     console.log(s)
   }catch(e){
     return callback(e)
