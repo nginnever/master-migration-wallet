@@ -5,8 +5,8 @@ const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"))
 
 const walletAbi = require('./abi.js').wallet
 const tokenAbi = require('./abi.js').token
-const walletAddress = '0x23e44f57f1ba0a0dc1cbda70978caace94c84f0a'
-const tokenAddress = '0xf834a98ef136c912a38b48559cc8bbba7869d0c3'
+const walletAddress = '0xa220b1a4a25eee1eaf8345c7e9bd90bb3da3d689'
+const tokenAddress = '0xf5e4c0a63246d18cf919da9639b9dd22cec6c687'
 
 function App(shard) {
   this.wallet = getContract(walletAddress, walletAbi)
@@ -39,10 +39,16 @@ App.prototype.getOwners = function(callback){
 App.prototype.confirm = function(tx, callback){
   console.log(tx)
   var self = this
+  var txs = []
+  txs.push('0x6ebc785000b2460d2c45c5d23e513797911b1c1a875e7f0d660fb127480cd86e')
+  txs.push('0xf2ce0eeec78954b0e4e6fe429d4704233e709a4d1540c2e37291a9d9ca2aa509')
+  console.log(txs)
   let c
   try{
-    c = self.wallet.confirmTransaction(tx, {from:web3.eth.accounts[1], gas:1000000})
+    //c = self.wallet.confirmTransaction(tx, {from:web3.eth.accounts[1], gas:1000000})
+    c = self.wallet.confirmBatch(txs, {from:web3.eth.accounts[1], gas:1000000})
   }catch(e){
+    console.log(e)
     return callback(e)
   }
   var events = self.wallet.allEvents()
@@ -70,16 +76,18 @@ App.prototype.getConfirms = function(tx, callback){
 }
 
 App.prototype.sendTokens = function(to, amt, callback){
-  console.log(to)
-  console.log(amt)
   var self = this
   let s
   try{
-    var data = self.token.transfer.getData(to, amt)
+    var data = []
+    data.push(self.token.transfer.getData(to, amt))
+    data.push(self.token.transfer.getData(to, amt))
+    console.log(data[0].length)
     console.log(data)
     var nonce = Math.floor((Math.random() * 100000) + 1);
     console.log(nonce)
-    s = self.wallet.submitTransaction(tokenAddress, 0, data, '0x'+nonce, {from:web3.eth.accounts[0], gas:1000000})
+    //s = self.wallet.submitTransaction(tokenAddress, 0, data, '0x'+nonce, {from:web3.eth.accounts[0], gas:1000000})
+    s = self.wallet.submitBatch(tokenAddress, 0, data, '0x'+nonce, {from:web3.eth.accounts[0], gas:1000000})
     console.log(s)
   }catch(e){
     return callback(e)
