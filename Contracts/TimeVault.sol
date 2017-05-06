@@ -7,17 +7,15 @@ contract STORJVault is SafeMath {
     StorjToken storjToken;
     address storjMultisig;
     uint256 unlockedAtBlockNumber;
-    //uint256 public constant numBlocksLocked = 1110857;
-    // smaller lock for testing
     uint256 public constant numBlocksLocked = 1110857;
 
-    /// @notice Constructor function sets the Lunyr Multisig address and
+    /// @notice Constructor function sets the Storj Multisig address and
     /// total number of locked tokens to transfer
-    function LUNVault(address _lunyrMultisig) internal {
-        if (_lunyrMultisig == 0x0) throw;
-        lunyrToken = LunyrToken(msg.sender);
-        lunyrMultisig = _lunyrMultisig;
-        isLUNVault = true;
+    function STORJVault(address _storjMultisig) internal {
+        if (_storjMultisig == 0x0) throw;
+        storjToken = StorjToken(msg.sender);
+        sotrjMultisig = _storjMultisig;
+        isSTORJVault = true;
         unlockedAtBlockNumber = safeAdd(block.number, numBlocksLocked); // 180 days of blocks later
     }
 }
