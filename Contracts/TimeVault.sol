@@ -1,4 +1,6 @@
 /// @title Time-locked vault of tokens allocated to Storj after 180 days
+/// based on Lunyr Token
+
 contract STORJVault is SafeMath {
 
     // flag to determine if address is for a real contract or not
@@ -18,4 +20,15 @@ contract STORJVault is SafeMath {
         isSTORJVault = true;
         unlockedAtBlockNumber = safeAdd(block.number, numBlocksLocked); // 180 days of blocks later
     }
+
+    /// @notice Transfer locked tokens to Storj's multisig wallet
+    function unlock() external {
+        // Wait your turn!
+        if (block.number < unlockedAtBlockNumber) throw;
+        // Will fail if allocation (and therefore toTransfer) is 0.
+        if (!storjToken.transfer(storjMultisig, storjToken.balanceOf(this))) throw;
+    }
+
+    // disallow ether payment
+    function () { throw; }
 }
