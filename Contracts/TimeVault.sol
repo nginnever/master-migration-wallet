@@ -1,30 +1,34 @@
-/// @title Time-locked vault of tokens allocated to Storj after 180 days
+pragma solidity ^0.4.8;
+
+/// @title Time-locked vault of tokens allocated to Storj after variable amount of days
 /// based on Lunyr Token
+
+import 'zeppelin/contracts/token/StandardToken.sol';
 
 contract STORJVault is SafeMath {
 
-    // flag to determine if address is for a real contract or not
-    bool public isSOTRJVault = false;
+    StandardToken storjToken;
+    address owner;
+    uint256 unlockedAtTime;
+    uint256 public constant timeLocked;
 
-    StorjToken storjToken;
-    address storjMultisig;
-    uint256 unlockedAtBlockNumber;
-    uint256 public constant numBlocksLocked = 1110857;
+
 
     /// @notice Constructor function sets the Storj Multisig address and
     /// total number of locked tokens to transfer
-    function STORJVault(address _storjMultisig) internal {
-        if (_storjMultisig == 0x0) throw;
-        storjToken = StorjToken(msg.sender);
-        sotrjMultisig = _storjMultisig;
-        isSTORJVault = true;
-        unlockedAtBlockNumber = safeAdd(block.number, numBlocksLocked); // 180 days of blocks later
+    function STORJVault(address _owner, uint256 _timeLocked) internal {
+        if (_owner == 0x0) throw;
+        timeLocked = _timeLocked;
+        storjToken = StandardToken(msg.sender);
+        owner = _owner;
+        // variable time locked in seconds since epoch
+        unlockedAtTime = safeAdd(block.timestamp, timeLocked);
     }
 
     /// @notice Transfer locked tokens to Storj's multisig wallet
     function unlock() external {
         // Wait your turn!
-        if (block.number < unlockedAtBlockNumber) throw;
+        if (block.timestamp < unlockedAtTime) throw;
         // Will fail if allocation (and therefore toTransfer) is 0.
         if (!storjToken.transfer(storjMultisig, storjToken.balanceOf(this))) throw;
     }
