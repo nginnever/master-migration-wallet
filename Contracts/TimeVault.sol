@@ -3,9 +3,9 @@
 
 import 'zeppelin/contracts/token/StandardToken.sol';
 
-contract TimeVault is SafeMath, StandardToken {
+contract TimeVault is SafeMath, BurnableToken {
     address owner;
-    StandardToken storjToken;
+    BurnableToken storjToken;
     uint256 unlockedAtTime;
     uint256 public timeLocked;
 
@@ -13,7 +13,7 @@ contract TimeVault is SafeMath, StandardToken {
     /// total number of locked tokens to transfer
     function TimeVault(address _owner, uint256 _timeLocked, address _token) {
         if (_owner == 0x0) throw;
-        storjToken = StandardToken(_token);
+        storjToken = BurnableToken(_token);
         timeLocked = _timeLocked;
         owner = _owner;
         // variable time locked in seconds since epoch
@@ -26,6 +26,12 @@ contract TimeVault is SafeMath, StandardToken {
         if (block.timestamp < unlockedAtTime) throw;
         // Will fail if allocation (and therefore toTransfer) is 0.
         if(!storjToken.transfer(owner, storjToken.balanceOf(this))) throw;
+    }
+    
+    /// Allow holders to burn tokens before unlock time
+    function burn(uint amount) {
+        if (msg.sender != owner) throw;
+        storjToken.burn(amount);
     }
 
     // disallow ether payment
